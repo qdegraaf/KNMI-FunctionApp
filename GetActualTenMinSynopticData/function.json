@@ -1,0 +1,14 @@
+{
+  "scriptFile": "get_synoptic_data.py",
+  "entryPoint": "main",
+  "bindings": [
+    {
+      "type": "timerTrigger",
+      "direction": "in",
+      "name": "timer",
+      "schedule": "0 */10  * * * * ",
+      "runOnStartup": false,
+      "useMonitor": false
+    }
+  ]
+}

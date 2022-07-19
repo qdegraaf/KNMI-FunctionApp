@@ -2,7 +2,13 @@
 
 # Testing
 pytest==7.1.2
+pytest-mock==3.8.2
+pytest-freezegun==0.4.2
 requests-mock==1.9.3
+
+# Fixing httpretty to older version until https://github.com/gabrielfalcao/HTTPretty/issues/425
+# is fixed.
+httpretty==1.0.5
 
 # Type hints
 mypy==0.960
