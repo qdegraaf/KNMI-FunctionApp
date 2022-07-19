@@ -19,8 +19,8 @@ test:
 # Formatting & Code strength
 
 format:
-	black GetActualTenMinSynopticData/ tests/ setup.py
-	isort GetActualTenMinSynopticData tests setup.py
+	black GetActualTenMinSynopticData/ loganalytics/ tests/ setup.py
+	isort GetActualTenMinSynopticData loganalytics tests setup.py
 
 
 lint:

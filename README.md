@@ -1,8 +1,6 @@
 # Introduction 
 KNMI-FA is a function app which contains the following functions:
 
-- GetActualTenMinSynopticData
-
 - **GetActualTenMinSynopticData**: Queries the KNMI API every 10 minutes to get the latest synoptic
 data files, list through them and store them locally
 

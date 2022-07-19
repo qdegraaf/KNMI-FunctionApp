@@ -10,8 +10,11 @@ from requests.adapters import Retry
 from requests.exceptions import RetryError
 from requests.sessions import HTTPAdapter
 
-from loganalytics.errors import ValidationError, LogAnalyticsWorkspaceRetryError, \
-    LogAnalyticsWorkspaceResponseError
+from loganalytics.errors import (
+    LogAnalyticsWorkspaceResponseError,
+    LogAnalyticsWorkspaceRetryError,
+    ValidationError,
+)
 
 
 class LogAnalyticsWorkspaceLogger:
