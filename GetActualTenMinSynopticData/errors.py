@@ -1,0 +1,2 @@
+class SynopticDataError(Exception):
+    pass
