@@ -14,6 +14,8 @@ setup(
     packages=find_packages(),
     install_requires=[
         "azure-functions==1.11.2",
+        "azure-identity==1.10.0",
+        "azure-storage-file-datalake==12.8.0",
         "requests==2.28.1",
     ],
 )

@@ -1,5 +1,7 @@
 import logging
+from datetime import datetime
 from os import environ
+from os.path import splitext
 from typing import (
     Dict,
     List,
@@ -7,12 +9,19 @@ from typing import (
 )
 
 import requests
+from azure.core.exceptions import HttpResponseError
 from azure.functions import TimerRequest
+from azure.storage.filedatalake import FileSystemClient
 from requests import HTTPError
 
-from GetActualTenMinSynopticData.errors import SynopticDataError
+from GetActualTenMinSynopticData.errors import (
+    SynopticDataError,
+    SynopticDataValidationError,
+)
+from GetActualTenMinSynopticData.models import validate_file_extension
 from loganalytics.law import LogAnalyticsWorkspaceLogger
 from setup import KNMI_API_ROOT
+from storage.adls import get_adls_client
 
 SYNOPTIC_ENDPOINT = (
     f"{KNMI_API_ROOT}/datasets/Actuele10mindataKNMIstations/versions/2/files"
@@ -23,14 +32,32 @@ class Processor:
     def __init__(
         self,
         logger: LogAnalyticsWorkspaceLogger,
+        adls_client: FileSystemClient,
     ):
         self.logger = logger
+        self.adls_client = adls_client
 
     def process(self, api_key: str):
         file_list = self.get_file_list(api_key)
         for f in file_list:
-            file_content = self.get_file_content(f["filename"], api_key)  # type: ignore
-            # TODO: Write file content somewhere
+            fname = f["filename"]
+            if not isinstance(fname, str):
+                self.logger.log(
+                    message=f"{fname} has invalid type {type(fname)}",
+                    severity=logging.ERROR,
+                )
+                raise SynopticDataValidationError(
+                    f"Invalid type {type(fname)}: for {fname}"
+                )
+            if not validate_file_extension(fname):
+                self.logger.log(
+                    message=f"Unknown file extension for filename: {fname} unable to "
+                    f"process",
+                    severity=logging.ERROR,
+                )
+                raise SynopticDataValidationError(f"Invalid filename: {fname}")
+            file_content = self.get_file_content(fname, api_key)
+            self.upload_file_content_to_adls(data=file_content, filename=fname)
 
     def get_file_list(self, api_key: str) -> List[Dict[str, Union[str, int]]]:
         """Get list of files from KNMI API. Example response from KNMI API:
@@ -122,6 +149,31 @@ class Processor:
                 f"URI: {url} Content: {str(resp.content)}"
             )
 
+    def upload_file_content_to_adls(self, data: bytes, filename: str):
+        self.logger.log(f"Uploading file: {filename}", severity=logging.INFO)
+        current_hour = datetime.utcnow().strftime("%Y/%m/%d/%H")
+        upload_path = f"{splitext(filename)[1]}{current_hour}/{filename}"
+        try:
+            f = self.adls_client.create_file(upload_path)
+            # TODO: Check if types match for data from KNMI and what Azure expects/allows for blob
+            f.upload_data(data=data, overwrite=True)
+        except HttpResponseError as e:
+            self.logger.log(
+                message=f"Unexpected HttpResponseError when attempting to upload {filename} to "
+                f"{self.adls_client.account_name}. Full error: {str(e)}",
+                severity=logging.ERROR,
+            )
+            # TODO: We might not want to fail on one failed upload, consider retrying or uploading
+            #  other files before raising
+            raise SynopticDataError(
+                "Unexpected HttpResponseError when attempting to upload {filename} to "
+                f"{self.adls_client.account_name}. Full error: {str(e)}"
+            )
+        self.logger.log(
+            message=f"Successfully uploaded file {filename} to {self.adls_client.account_name}",
+            severity=logging.INFO,
+        )
+
 
 # Azure typechecks this signature. So do not touch it
 def main(timer: TimerRequest):
@@ -130,7 +182,10 @@ def main(timer: TimerRequest):
         shared_key=environ["LAWKEY"],
         custom_log_table_name="GetActualTenMinSynopticData",
     )
-    proc = Processor(
-        logger=azure_logger,
+    adls_client = get_adls_client(
+        account_name=environ["ADLSACCOUNTNAME"],
+        account_key=environ["ADLSACCOUNTKEY"],
+        container="knmisynoptic",
     )
+    proc = Processor(logger=azure_logger, adls_client=adls_client)
     proc.process(environ["KNMIAPIKEY"])
