@@ -1,3 +1,6 @@
+[![Tests & Coverage](https://github.com/qdegraaf/knmi-functionapp/actions/workflows/tests.yml/badge.svg)](https://github.com/qdegraaf/knmi-functionapp/actions/workflows/tests.yml)
+[![codecov](https://codecov.io/gh/qdegraaf/KNMI-FunctionApp/branch/main/graph/badge.svg?token=7BOWlltUMV)](https://codecov.io/gh/qdegraaf/KNMI-FunctionApp)
+
 # Introduction 
 KNMI-FA is a function app which contains the following functions:
 
