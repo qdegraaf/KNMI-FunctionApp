@@ -20,8 +20,9 @@ from GetActualTenMinSynopticData.errors import (
 )
 from GetActualTenMinSynopticData.models import validate_file_extension
 from loganalytics.law import LogAnalyticsWorkspaceLogger
-from setup import KNMI_API_ROOT
 from storage.adls import get_adls_client
+
+KNMI_API_ROOT = "https://api.dataplatform.knmi.nl/open-data/v1"
 
 SYNOPTIC_ENDPOINT = (
     f"{KNMI_API_ROOT}/datasets/Actuele10mindataKNMIstations/versions/2/files"
@@ -156,7 +157,7 @@ class Processor:
         try:
             f = self.adls_client.create_file(upload_path)
             # TODO: Check if types match for data from KNMI and what Azure expects/allows for blob
-            f.upload_data(data=data, overwrite=True)
+            f.upload_data(data=data, overwrite=True)  # type: ignore
         except HttpResponseError as e:
             self.logger.log(
                 message=f"Unexpected HttpResponseError when attempting to upload {filename} to "
