@@ -1,0 +1,12 @@
+{
+  "scriptFile": "knw_to_sql.py",
+  "bindings": [
+        {
+            "name": "blob",
+            "type": "blobTrigger",
+            "direction": "in",
+            "path": "knmisynoptic/csv/{year}/{month}/{day}/{hour}/KNW-1.0_H37-ERA_NL-{suffix}.csv",
+            "connection":"ADLSACCOUNTNAME"
+        }
+    ]
+}
