@@ -47,7 +47,9 @@ class Processor:
                     f"Invalid type {type(fname)}: for {fname}"
                 )
             if not validate_file_extension(fname):
-                raise SynopticDataValidationError(f"Invalid file extension for file: {fname}")
+                raise SynopticDataValidationError(
+                    f"Invalid file extension for file: {fname}"
+                )
             file_content = self.get_file_content(fname, api_key)
             self.upload_file_content_to_adls(data=file_content, filename=fname)
 
@@ -111,15 +113,15 @@ class Processor:
                 file_resp = requests.get(content_url)
             except HTTPError as err:
                 raise SynopticDataError(
-                    f"Unexpected HTTPError while getting content from {content_url}: {str(err)}"
+                    f"Unexpected HTTPError while getting content from url {content_url}: {str(err)}"
                 )
 
-            if resp.status_code == 200:
+            if file_resp.status_code == 200:
                 return file_resp.content
             else:
                 raise SynopticDataError(
-                    f"Unexpected status code {resp.status_code} for getting content from url "
-                    f"{content_url} Content: {str(resp.content)}"
+                    f"Unexpected status code {file_resp.status_code} for getting content from url "
+                    f"{content_url} Content: {str(file_resp.content)}"
                 )
         else:
             raise SynopticDataError(
@@ -130,7 +132,7 @@ class Processor:
     def upload_file_content_to_adls(self, data: bytes, filename: str):
         self.logger.log(message=f"Uploading file: {filename}", severity=logging.INFO)
         current_hour = datetime.utcnow().strftime("%Y/%m/%d/%H")
-        upload_path = f"{splitext(filename)[1]}{current_hour}/{filename}"
+        upload_path = f"{splitext(filename)[1].lstrip('.')}/{current_hour}/{filename}"
         try:
             f = self.adls_client.create_file(upload_path)
             # TODO: Check if types match for data from KNMI and what Azure expects/allows for blob
