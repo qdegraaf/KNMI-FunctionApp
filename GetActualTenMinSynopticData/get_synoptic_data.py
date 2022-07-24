@@ -43,20 +43,11 @@ class Processor:
         for f in file_list:
             fname = f["filename"]
             if not isinstance(fname, str):
-                self.logger.log(
-                    message=f"{fname} has invalid type {type(fname)}",
-                    severity=logging.ERROR,
-                )
                 raise SynopticDataValidationError(
                     f"Invalid type {type(fname)}: for {fname}"
                 )
             if not validate_file_extension(fname):
-                self.logger.log(
-                    message=f"Unknown file extension for filename: {fname} unable to "
-                    f"process",
-                    severity=logging.ERROR,
-                )
-                raise SynopticDataValidationError(f"Invalid filename: {fname}")
+                raise SynopticDataValidationError(f"Invalid file extension for file: {fname}")
             file_content = self.get_file_content(fname, api_key)
             self.upload_file_content_to_adls(data=file_content, filename=fname)
 
@@ -80,11 +71,6 @@ class Processor:
         try:
             resp = requests.get(url=SYNOPTIC_ENDPOINT, headers=headers)
         except HTTPError as err:
-            self.logger.log(
-                message=f"Unexpected HTTPError while getting file list from {SYNOPTIC_ENDPOINT}: "
-                f"{str(err)}",
-                severity=logging.ERROR,
-            )
             raise SynopticDataError(
                 f"Unexpected HTTPError while getting file list from {SYNOPTIC_ENDPOINT}: "
                 f"{str(err)}"
@@ -112,10 +98,6 @@ class Processor:
         try:
             resp = requests.get(url=url, headers=headers)
         except HTTPError as err:
-            self.logger.log(
-                message=f"Unexpected HTTPError while getting content URL from {url}: {str(err)}",
-                severity=logging.ERROR,
-            )
             raise SynopticDataError(
                 f"Unexpected HTTPError while getting content URL from {url}: {str(err)}"
             )
@@ -128,11 +110,6 @@ class Processor:
             try:
                 file_resp = requests.get(content_url)
             except HTTPError as err:
-                self.logger.log(
-                    message=f"Unexpected HTTPError while getting content from {content_url}:"
-                    f" {str(err)}",
-                    severity=logging.ERROR,
-                )
                 raise SynopticDataError(
                     f"Unexpected HTTPError while getting content from {content_url}: {str(err)}"
                 )
@@ -151,7 +128,7 @@ class Processor:
             )
 
     def upload_file_content_to_adls(self, data: bytes, filename: str):
-        self.logger.log(f"Uploading file: {filename}", severity=logging.INFO)
+        self.logger.log(message=f"Uploading file: {filename}", severity=logging.INFO)
         current_hour = datetime.utcnow().strftime("%Y/%m/%d/%H")
         upload_path = f"{splitext(filename)[1]}{current_hour}/{filename}"
         try:
@@ -159,15 +136,10 @@ class Processor:
             # TODO: Check if types match for data from KNMI and what Azure expects/allows for blob
             f.upload_data(data=data, overwrite=True)  # type: ignore
         except HttpResponseError as e:
-            self.logger.log(
-                message=f"Unexpected HttpResponseError when attempting to upload {filename} to "
-                f"{self.adls_client.account_name}. Full error: {str(e)}",
-                severity=logging.ERROR,
-            )
             # TODO: We might not want to fail on one failed upload, consider retrying or uploading
             #  other files before raising
             raise SynopticDataError(
-                "Unexpected HttpResponseError when attempting to upload {filename} to "
+                f"Unexpected HttpResponseError when attempting to upload {filename} to "
                 f"{self.adls_client.account_name}. Full error: {str(e)}"
             )
         self.logger.log(
@@ -189,4 +161,11 @@ def main(timer: TimerRequest):
         container="knmisynoptic",
     )
     proc = Processor(logger=azure_logger, adls_client=adls_client)
-    proc.process(environ["KNMIAPIKEY"])
+    try:
+        proc.process(environ["KNMIAPIKEY"])
+    except (SynopticDataError, SynopticDataValidationError) as e:
+        proc.logger.log(
+            message=f"Unexpected Error when getting KNMI data Full error: {str(e)}",
+            severity=logging.ERROR,
+        )
+        raise
