@@ -14,6 +14,8 @@ setup(
         "azure-functions==1.11.2",
         "azure-identity==1.10.0",
         "azure-storage-file-datalake==12.8.0",
+        "psycopg2==2.9.3",
         "requests==2.28.1",
+        "sqlalchemy==1.4.39",
     ],
 )
