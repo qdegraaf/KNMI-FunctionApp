@@ -6,6 +6,8 @@ KNMI-FA is a function app which contains the following functions:
 
 - **GetActualTenMinSynopticData**: Queries the KNMI API every 10 minutes to get the latest synoptic
 data files, list through them and store them locally
+- **KNWToSQL**: Triggers when KNW CSF files land in a storage account and stores the KNW data in a 
+postgres database. For info on the dataset see [the API docs](https://dataplatform.knmi.nl/dataset/knw-csv-ts-update-1-0)
 
 
 ### Dependencies
