@@ -89,7 +89,7 @@ class Processor:
 
         else:
             raise SynopticDataError(
-                f"Unexpected status code {resp.status_code} for getting content from "
+                f"Unexpected status code {resp.status_code} for getting file list from "
                 f"URI: {SYNOPTIC_ENDPOINT} Content: {str(resp.content)}"
             )
 
@@ -113,7 +113,8 @@ class Processor:
                 file_resp = requests.get(content_url)
             except HTTPError as err:
                 raise SynopticDataError(
-                    f"Unexpected HTTPError while getting content from url {content_url}: {str(err)}"
+                    f"Unexpected HTTPError while getting content from url {content_url}:"
+                    f" {str(err)}"
                 )
 
             if file_resp.status_code == 200:

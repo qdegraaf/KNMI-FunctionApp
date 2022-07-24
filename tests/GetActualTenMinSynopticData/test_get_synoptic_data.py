@@ -5,6 +5,62 @@ from requests import HTTPError
 from GetActualTenMinSynopticData.errors import SynopticDataError
 
 
+def test_get_file_list_returns_file_list_on_200(mock_processor, requests_mock):
+    requests_mock.get(
+        url="https://api.dataplatform.knmi.nl/open-data/v1/datasets/Actuele10mindataKNMIstations"
+        "/versions/2/files",
+        status_code=200,
+        json={"files": [{"filename": "file1"}, {"filename": "file2"}]},
+    )
+
+    result = mock_processor.get_file_list("testKey")
+
+    assert result == [{"filename": "file1"}, {"filename": "file2"}]
+
+    mock_processor.logger.log.assert_called_with(
+        message="Successfully got 2 filenames from: https://api.dataplatform.knmi.nl/open-data/v1/"
+        "datasets/Actuele10mindataKNMIstations/versions/2/files",
+        severity=20,
+    )
+
+
+def test_get_file_list_raises_error_on_invalid_status_code(
+    mock_processor, requests_mock
+):
+    requests_mock.get(
+        url="https://api.dataplatform.knmi.nl/open-data/v1/datasets/Actuele10mindataKNMIstations"
+        "/versions/2/files",
+        status_code=500,
+    )
+
+    with pytest.raises(SynopticDataError) as excinfo:
+        mock_processor.get_file_list("testKey")
+
+    assert (
+        str(excinfo.value)
+        == "Unexpected status code 500 for getting file list from URI: "
+        "https://api.dataplatform.knmi.nl/open-data/v1/datasets/Actuele"
+        "10mindataKNMIstations/versions/2/files Content: b''"
+    )
+
+
+def test_get_file_list_raises_error_on_http_error(mock_processor, requests_mock):
+    requests_mock.get(
+        url="https://api.dataplatform.knmi.nl/open-data/v1/datasets/Actuele10mindataKNMIstations"
+        "/versions/2/files",
+        exc=HTTPError("Oops"),
+    )
+
+    with pytest.raises(SynopticDataError) as excinfo:
+        mock_processor.get_file_list("testKey")
+
+    assert (
+        str(excinfo.value) == "Unexpected HTTPError while getting file list from "
+        "https://api.dataplatform.knmi.nl/open-data/v1/datasets/Actuele"
+        "10mindataKNMIstations/versions/2/files: Oops"
+    )
+
+
 def test_get_file_content_requests_data_from_content_url_on_200(
     mock_processor, requests_mock
 ):
@@ -84,7 +140,9 @@ def test_get_file_content_raises_error_on_invalid_status_code_for_get_url(
 
     assert (
         str(excinfo.value)
-        == "Unexpected status code 500 for getting content URL from URI: https://api.dataplatform.knmi.nl/open-data/v1/datasets/Actuele10mindataKNMIstations/versions/2/files/file.nc/url Content: b''"
+        == "Unexpected status code 500 for getting content URL from URI: https://api.dataplatform"
+        ".knmi.nl/open-data/v1/datasets/Actuele10mindataKNMIstations/versions/2/files/"
+        "file.nc/url Content: b''"
     )
 
 
@@ -117,7 +175,8 @@ def test_upload_file_content_to_adls_raises_error_on_http_response_error_for_get
 
     assert (
         str(excinfo.value)
-        == "Unexpected HttpResponseError when attempting to upload file.nc to TestAccount. Full error: Oops"
+        == "Unexpected HttpResponseError when attempting to upload file.nc to TestAccount. "
+        "Full error: Oops"
     )
 
 
