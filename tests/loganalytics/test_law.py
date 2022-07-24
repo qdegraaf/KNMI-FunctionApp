@@ -14,7 +14,7 @@ from loganalytics.errors import (
 )
 
 
-@pytest.mark.freeze_time("2020-01-01")
+@pytest.mark.freeze_time("2022-01-01")
 def test_build_signature_builds_correct_signature(law_logger):
     string_format_of_test__log_data = json.dumps(
         {"message": "Test 1-2-3", "severity": 10}
@@ -24,7 +24,7 @@ def test_build_signature_builds_correct_signature(law_logger):
         "POST\n"
         "41\n"
         "application/json\n"
-        "x-ms-date:Wed, 01 Jan 2020 00:00:00 GMT\n"
+        "x-ms-date:Sat, 01 Jan 2022 00:00:00 GMT\n"
         "/api/logs"
     )
     message_in_bytes = bytes(message, encoding="utf-8")
@@ -44,7 +44,7 @@ def test_build_signature_builds_correct_signature(law_logger):
 
 
 @httpretty.activate
-@pytest.mark.freeze_time("2020-01-01")
+@pytest.mark.freeze_time("2022-01-01")
 def test_log_builds_correct_request(law_logger, mocker):
     signature_mock = mocker.patch(
         "loganalytics.law.LogAnalyticsWorkspaceLogger._build_signature",
@@ -70,7 +70,7 @@ def test_log_builds_correct_request(law_logger, mocker):
     )
     assert history[0].headers.get("Content-Type") == "application/json"
     assert history[0].headers.get("Log-Type") == "Test_LAW"
-    assert history[0].headers.get("x-ms-date") == "Wed, 01 Jan 2020 00:00:00 GMT"
+    assert history[0].headers.get("x-ms-date") == "Sat, 01 Jan 2022 00:00:00 GMT"
 
 
 def test_log_raises_validation_error_if_it_receives_wrong_log_types(law_logger):
@@ -86,7 +86,7 @@ def test_log_raises_validation_error_if_it_receives_wrong_log_types(law_logger):
 
 
 @httpretty.activate
-@pytest.mark.freeze_time("2020-01-01")
+@pytest.mark.freeze_time("2022-01-01")
 def test__log_retries_on_503_response(law_logger, mocker):
     signature_mock = mocker.patch(
         "loganalytics.law.LogAnalyticsWorkspaceLogger._build_signature",
@@ -118,11 +118,11 @@ def test__log_retries_on_503_response(law_logger, mocker):
         )
         assert request.headers.get("Content-Type") == "application/json"
         assert request.headers.get("Log-Type") == "Test_LAW"
-        assert request.headers.get("x-ms-date") == "Wed, 01 Jan 2020 00:00:00 GMT"
+        assert request.headers.get("x-ms-date") == "Sat, 01 Jan 2022 00:00:00 GMT"
 
 
 @httpretty.activate
-@pytest.mark.freeze_time("2020-01-01")
+@pytest.mark.freeze_time("2022-01-01")
 def test__log_raises_retry_error_after_too_many_retries_on_503_response(
     law_logger,
     mocker,
@@ -154,7 +154,7 @@ def test__log_raises_retry_error_after_too_many_retries_on_503_response(
 
 
 @httpretty.activate
-@pytest.mark.freeze_time("2020-01-01")
+@pytest.mark.freeze_time("2022-01-01")
 def test__log_raises_response_error_on_non_200_response(law_logger, mocker):
     signature_mock = mocker.patch(
         "loganalytics.law.LogAnalyticsWorkspaceLogger._build_signature",
@@ -181,7 +181,7 @@ def test__log_raises_response_error_on_non_200_response(law_logger, mocker):
 
 
 @httpretty.activate
-@pytest.mark.freeze_time("2020-01-01")
+@pytest.mark.freeze_time("2022-01-01")
 def test__log_raises_calls_itself_recursively_on_invalid_signature_error(
     law_logger, mocker
 ):

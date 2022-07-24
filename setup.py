@@ -5,8 +5,6 @@ from setuptools import (
 
 version = "1.0.0"
 
-KNMI_API_ROOT = "https://api.dataplatform.knmi.nl/open-data/v1"
-
 setup(
     name="KNMI-FA",
     description="Function App to run timed functions on the KNMI API",
