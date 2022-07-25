@@ -1,5 +1,6 @@
 import csv
 import logging
+from datetime import datetime
 from io import StringIO
 from os import environ
 from typing import (
@@ -30,47 +31,47 @@ class Processor:
         rows = self.read_file_into_dicts(file)
         for row in rows:
             entry = KNWData(
-                dtg=row["DTG"],
-                f010=row["F010"],
-                d010=row["D010"],
-                to10=row["To10"],
-                q010=row["Q010"],
-                p010=row["P010"],
-                f020=row["F020"],
-                d020=row["D020"],
-                to20=row["To20"],
-                q020=row["Q020"],
-                p020=row["P020"],
-                f040=row["F040"],
-                d040=row["D040"],
-                to40=row["To40"],
-                q040=row["Q040"],
-                p040=row["P040"],
-                f060=row["F060"],
-                d060=row["D060"],
-                to60=row["To60"],
-                q060=row["Q060"],
-                p060=row["P060"],
-                f080=row["F080"],
-                d080=row["D080"],
-                to80=row["To80"],
-                q080=row["Q080"],
-                p080=row["P080"],
-                f100=row["F100"],
-                d100=row["D100"],
-                t100=row["T100"],
-                q100=row["Q100"],
-                p100=row["P100"],
-                f150=row["F150"],
-                d150=row["D150"],
-                t150=row["T150"],
-                q150=row["Q150"],
-                p150=row["P150"],
-                f200=row["F200"],
-                d200=row["D200"],
-                t200=row["T200"],
-                q200=row["Q200"],
-                p200=row["P200"],
+                dtg=datetime.strptime(row["DTG"], "%Y-%m-%d %H:%M"),
+                f010=float(row["F010"]),
+                d010=float(row["D010"]),
+                t010=float(row["T010"]),
+                q010=float(row["Q010"]),
+                p010=float(row["P010"]),
+                f020=float(row["F020"]),
+                d020=float(row["D020"]),
+                t020=float(row["T020"]),
+                q020=float(row["Q020"]),
+                p020=float(row["P020"]),
+                f040=float(row["F040"]),
+                d040=float(row["D040"]),
+                t040=float(row["T040"]),
+                q040=float(row["Q040"]),
+                p040=float(row["P040"]),
+                f060=float(row["F060"]),
+                d060=float(row["D060"]),
+                t060=float(row["T060"]),
+                q060=float(row["Q060"]),
+                p060=float(row["P060"]),
+                f080=float(row["F080"]),
+                d080=float(row["D080"]),
+                t080=float(row["T080"]),
+                q080=float(row["Q080"]),
+                p080=float(row["P080"]),
+                f100=float(row["F100"]),
+                d100=float(row["D100"]),
+                t100=float(row["T100"]),
+                q100=float(row["Q100"]),
+                p100=float(row["P100"]),
+                f150=float(row["F150"]),
+                d150=float(row["D150"]),
+                t150=float(row["T150"]),
+                q150=float(row["Q150"]),
+                p150=float(row["P150"]),
+                f200=float(row["F200"]),
+                d200=float(row["D200"]),
+                t200=float(row["T200"]),
+                q200=float(row["Q200"]),
+                p200=float(row["P200"]),
             )
             self.sql_session.add(entry)
         try:
@@ -93,11 +94,11 @@ class Processor:
         for i in range(8):
             csv_data.__next__()
 
-        dicts = csv.DictReader(csv_data)
-        # remove silly characters from column names
+        dicts = csv.DictReader(csv_data, delimiter="\t")
         if not dicts.fieldnames:
             raise KNWError(f"Could not get fieldnames for file: {file.name}")
 
+        # remove silly characters from column names
         dicts.fieldnames = [x.replace("#", "").strip() for x in dicts.fieldnames]
 
         return list(dicts)
@@ -119,4 +120,10 @@ def main(blob: InputStream):
         logger=azure_logger,
         sql_session=psql_session,
     )
-    proc.process(blob)
+    try:
+        proc.process(blob)
+    except (SQLAlchemyError, KNWError) as e:
+        proc.logger.log(
+            message=f"Unexpected Error while processing KNW data Full error: {str(e)}",
+            severity=logging.ERROR,
+        )
