@@ -1,19 +1,24 @@
-from sqlalchemy import Column, DateTime, Float
+from sqlalchemy import (
+    Column,
+    DateTime,
+    Float,
+)
 from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
 
 
-class KNWData(Base):
+class KNWData(Base):  # type: ignore
     """
     From file header:
     F (wind speed) in m/s, D (wind from direction) in degree and clockwise from North,
     T (temperature) in Kelvin, Q (specific humidity) in kg/kg, P (pressure) in Pascal
     """
+
     __tablename__ = "knw_data"
 
     dtg = Column(DateTime, primary_key=True, nullable=False)
-    f010 = Column(Float, nullable=False, )
+    f010 = Column(Float, nullable=False)
     d010 = Column(Float, nullable=False)
     to10 = Column(Float, nullable=False)
     q010 = Column(Float, nullable=False)
@@ -38,18 +43,18 @@ class KNWData(Base):
     to80 = Column(Float, nullable=False)
     q080 = Column(Float, nullable=False)
     p080 = Column(Float, nullable=False)
-    f0100 = Column(Float, nullable=False)
-    d0100 = Column(Float, nullable=False)
-    to100 = Column(Float, nullable=False)
-    q0100 = Column(Float, nullable=False)
-    p0100 = Column(Float, nullable=False)
-    f0150 = Column(Float, nullable=False)
-    d0150 = Column(Float, nullable=False)
-    to150 = Column(Float, nullable=False)
-    q0150 = Column(Float, nullable=False)
-    p0150 = Column(Float, nullable=False)
-    f0200 = Column(Float, nullable=False)
-    d0200 = Column(Float, nullable=False)
-    to200 = Column(Float, nullable=False)
-    q0200 = Column(Float, nullable=False)
-    p0200 = Column(Float, nullable=False)
+    f100 = Column(Float, nullable=False)
+    d100 = Column(Float, nullable=False)
+    t100 = Column(Float, nullable=False)
+    q100 = Column(Float, nullable=False)
+    p100 = Column(Float, nullable=False)
+    f150 = Column(Float, nullable=False)
+    d150 = Column(Float, nullable=False)
+    t150 = Column(Float, nullable=False)
+    q150 = Column(Float, nullable=False)
+    p150 = Column(Float, nullable=False)
+    f200 = Column(Float, nullable=False)
+    d200 = Column(Float, nullable=False)
+    t200 = Column(Float, nullable=False)
+    q200 = Column(Float, nullable=False)
+    p200 = Column(Float, nullable=False)

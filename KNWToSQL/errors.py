@@ -1,0 +1,2 @@
+class KNWError(Exception):
+    pass
