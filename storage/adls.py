@@ -1,7 +1,10 @@
 from typing import Union
 
 from azure.identity import ManagedIdentityCredential
-from azure.storage.filedatalake import FileSystemClient, DataLakeServiceClient
+from azure.storage.filedatalake import (
+    DataLakeServiceClient,
+    FileSystemClient,
+)
 
 AccountKey = str
 

@@ -1,7 +1,7 @@
 """Add KNWData model
 
 Revision ID: bd3d80b93c6f
-Revises: 
+Revises:
 Create Date: 2022-07-24 21:22:22.106165
 
 """
