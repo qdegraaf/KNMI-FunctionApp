@@ -1,0 +1,8 @@
+#kdc:filename=KNW-1.0_H37-ERA_NL-001-001.zip
+#kdc:temporal_extent=1979-01-01T01:00:00Z - 2014-01-01T00:00:00Z
+#kdc:westbound_longitude=1.48935
+#kdc:eastbound_longitude=1.52482
+#kdc:northbound_latitude=50.43816
+#kdc:southbound_latitude=50.41556
+#kdc:file_version=1.0
+# F (wind speed) in m/s, D (wind from direction) in degree and clockwise from North, T (temperature) in Kelvin, Q (specific humidity) in kg/kg, P (pressure) in Pascal
