@@ -48,7 +48,7 @@ msrest==0.7.1
     # via
     #   azure-storage-blob
     #   azure-storage-file-datalake
-oauthlib==3.2.0
+oauthlib==3.2.1
     # via requests-oauthlib
 portalocker==2.5.1
     # via msal-extensions
