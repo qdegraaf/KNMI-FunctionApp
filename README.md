@@ -31,7 +31,7 @@ to regenerate the requirements file.
 ### Tests
 Tests for this project use pytest and can be run with
 ```bash
-make test
+make t
 ```
 after installing the requisite dependencies.
 
