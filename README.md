@@ -26,12 +26,12 @@ If you add, remove or update dependencies, make sure `setup.py` is updated and r
 ```bash
 make requirements
 ```
-to regenerate the requirements file.
+to regenerate the reqsadasduirements file.
 
 ### Tests
 Tests for this project use pytest and can be run with
 ```bash
-make t
+make test
 ```
 after installing the requisite dependencies.
 
