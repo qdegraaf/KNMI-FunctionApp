@@ -18,7 +18,7 @@ azure-storage-blob==12.13.0
     # via azure-storage-file-datalake
 azure-storage-file-datalake==12.8.0
     # via KNMI-FA (setup.py)
-certifi==2022.6.15
+certifi==2022.12.7
     # via
     #   msrest
     #   requests
