@@ -19,10 +19,10 @@ test:
 # Formatting & Code strength
 
 format:
-	black GetActualTenMinSynopticData/ KNWToSQL/ storage/ loganalytics/ tests/ setup.py
-	isort GetActualTenMinSynopticData KNWToSQL storage loganalytics tests setup.py
+	black GetActualTenMinSynopticData/ KNWToSQL/ storage/ loganalytics/ tests/
+	isort GetActualTenMinSynopticData KNWToSQL storage loganalytics tests
 
 
 lint:
-	flake8 & mypy --config-file=mypy.ini .
+	flake8 & mypy .
 
