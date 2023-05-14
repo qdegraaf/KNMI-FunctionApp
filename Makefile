@@ -20,9 +20,8 @@ test:
 
 format:
 	black GetActualTenMinSynopticData/ KNWToSQL/ storage/ loganalytics/ tests/
-	isort GetActualTenMinSynopticData KNWToSQL storage loganalytics tests
 
 
 lint:
-	flake8 & mypy .
+	ruff .
 
