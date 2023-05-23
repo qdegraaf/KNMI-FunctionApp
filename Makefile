@@ -1,4 +1,4 @@
-.PHONY: clean, install, requirements, test, format, lint
+.PHONY: clean, install, install-dev, test, format, lint
 
 clean:
 	find . -name '*.pyc' -delete
@@ -6,11 +6,10 @@ clean:
 	find . -name '*.egg-info' | xargs rm -rf
 
 install:
-	pip install -r requirements_dev.txt
+	pip install .
 
-requirements:
-	pip install pip-tools
-	pip-compile
+install-dev:
+	pip install .[dev,test,lint]
 
 # Testing
 test:
