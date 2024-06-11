@@ -7,7 +7,7 @@ name = "KNMI-Functionapp"
 version = "0.1.0"
 dependencies = [
     "azure-functions==1.11.2",
-    "azure-identity==1.10.0",
+    "azure-identity==1.16.1",
     "azure-storage-file-datalake==12.8.0",
     "psycopg2==2.9.3",
     "requests==2.31.0",
